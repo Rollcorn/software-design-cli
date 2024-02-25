@@ -7,6 +7,9 @@ import ru.itmo.streams.Stream;
 import ru.itmo.utils.StreamDescriptor;
 
 public class ExternalCommand implements ICommand{
+
+    public ExternalCommand() {  }
+
     @Override
     public void execute(Stream stream) {
         try {
