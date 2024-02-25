@@ -1,27 +1,36 @@
 package ru.itmo;
 
-import jdk.jshell.spi.ExecutionControl;
-import ru.itmo.processing.commands.ICommand;
+import ru.itmo.processing.IPipelineExecutor;
+import ru.itmo.processing.PipelineExecutorImpl;
+import ru.itmo.processing.parser.IParser;
+import ru.itmo.processing.parser.ParserImpl;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class ICliImpl implements ICli {
+    IParser parser;
+
     @Override
-    public void run() throws ExecutionControl.NotImplementedException {
+    public void run() {
+        // ExternService -> getGlobalArgs -> executeGlobalProgram
+        HashMap<String, String> globalArgs = new HashMap<>();
+        globalArgs.put("path", "$PATH:/some/path");
+
         // читаем вход в цикле до 'exit'
-        Scanner in = new Scanner(System.in);
+        IPipelineExecutor pipelineExecutor = PipelineExecutorImpl.getPipelineExecutorImpl(
+                new ParserImpl(),
+                globalArgs
+        );
+
 
         boolean exit = false;
         while (!exit) {
-            String input = in.next();
-            // парсим команды -> получаем команды
-            List<ICommand> coms;
-
+            Scanner in = new Scanner(System.in);
+            String inputString = in.next();
+//            e.readParam(inputString);
             // выполняем команды
-            while (true) {
-
-            }
+            pipelineExecutor.execute(inputString);
         }
     }
 }
