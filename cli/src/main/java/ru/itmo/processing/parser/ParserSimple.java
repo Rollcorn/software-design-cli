@@ -6,8 +6,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class ParserSimple implements IParser {
-    @Override
-    public List<String> tokenizeString(String command) {
+    private List<String> tokenizeString(String command) {
         List<String> tokens = new ArrayList<>();
         StringBuilder tokenBuilder = new StringBuilder();
         boolean inQuotes = false;
@@ -47,7 +46,7 @@ public class ParserSimple implements IParser {
     }
 
     @Override
-    public List<ICommand> parse(List<String> tokens) {
+    public List<ICommand> parse(String tokens) {
         return null;
     }
 }

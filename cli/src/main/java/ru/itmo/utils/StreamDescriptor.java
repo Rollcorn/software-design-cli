@@ -1,7 +1,7 @@
 package ru.itmo.utils;
 
 public enum StreamDescriptor {
-    INPUT,
+//    INPUT,
     OUTPUT,
     ERROR
 }

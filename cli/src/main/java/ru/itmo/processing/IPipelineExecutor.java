@@ -1,6 +1,9 @@
 package ru.itmo.processing;
 
+import ru.itmo.streams.Stream;
+
 public interface IPipelineExecutor {
+    boolean isFinished();
 
     /**
      * Выполняет пайплайн.
@@ -8,5 +11,5 @@ public interface IPipelineExecutor {
      * @param inputString Входная строка для выполнения пайплайна.
      * @throws RuntimeException Если произошла ошибка при выполнении пайплайна.
      */
-    void execute(String inputString);
+    Stream execute(String inputString);
 }

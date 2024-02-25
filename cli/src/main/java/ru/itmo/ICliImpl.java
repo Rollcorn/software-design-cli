@@ -3,7 +3,9 @@ package ru.itmo;
 import ru.itmo.processing.IPipelineExecutor;
 import ru.itmo.processing.PipelineExecutorImpl;
 import ru.itmo.processing.parser.IParser;
-import ru.itmo.processing.parser.ParserImpl;
+import ru.itmo.processing.parser.ParserSimple;
+import ru.itmo.processing.parser.SubstituteSimple;
+import ru.itmo.streams.Stream;
 
 import java.util.HashMap;
 import java.util.Scanner;
@@ -19,18 +21,22 @@ public class ICliImpl implements ICli {
 
         // читаем вход в цикле до 'exit'
         IPipelineExecutor pipelineExecutor = PipelineExecutorImpl.getPipelineExecutorImpl(
-                new ParserImpl(),
-                globalArgs
+                new ParserSimple(),
+                globalArgs,
+                new SubstituteSimple()
         );
 
 
-        boolean exit = false;
-        while (!exit) {
+        while (!pipelineExecutor.isFinished()) {
+            System.out.print(">>");
             Scanner in = new Scanner(System.in);
             String inputString = in.next();
 //            e.readParam(inputString);
             // выполняем команды
-            pipelineExecutor.execute(inputString);
+            Stream str = pipelineExecutor.execute(inputString);
+            System.out.println("str result");
+
+            // решаю как выводить
         }
     }
 }

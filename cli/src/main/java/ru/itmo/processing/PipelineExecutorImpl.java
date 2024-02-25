@@ -1,9 +1,12 @@
 package ru.itmo.processing;
 
 
+import ru.itmo.processing.commands.ExitCommand;
 import ru.itmo.processing.commands.ICommand;
 import ru.itmo.processing.parser.IParser;
+import ru.itmo.processing.parser.ISubstitute;
 import ru.itmo.streams.Stream;
+import ru.itmo.streams.StreamImpl;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +14,9 @@ import java.util.Map;
 
 public class PipelineExecutorImpl implements IPipelineExecutor {
     static private PipelineExecutorImpl executor;
+    private ISubstitute substitutor;
+    boolean isFinished;
+
     /**
      * Парсер для разбора команд.
      */
@@ -19,7 +25,7 @@ public class PipelineExecutorImpl implements IPipelineExecutor {
      * Глобальные аргументы для выполнения пайплайна.
      */
     private Map<String, String> globalArgs;
-    private Stream stream; // мапа с потоками? | он назначается каждой команде?
+//    private Stream stream; // мапа с потоками? | он назначается каждой команде?
 
     /**
      * Создает новый экземпляр PipelineExecutorImpl.
@@ -27,35 +33,47 @@ public class PipelineExecutorImpl implements IPipelineExecutor {
      * @param parser Парсер для разбора команд.
      * @param params Глобальные параметры для выполнения пайплайна.
      */
-    private PipelineExecutorImpl(IParser parser, HashMap<String, String> params) {
+    private PipelineExecutorImpl(IParser parser, HashMap<String, String> params, ISubstitute substitutor) {
         this.parser = parser;
         this.globalArgs = params;
+        this.substitutor = substitutor;
     }
 
     /**
      * Возвращает экземпляр PipelineExecutorImpl.
      *
-     * @param parser Парсер для разбора команд.
-     * @param params Глобальные параметры для выполнения пайплайна.
+     * @param parser           Парсер для разбора команд.
+     * @param params           Глобальные параметры для выполнения пайплайна.
+     * @param substitutor
      * @return Экземпляр PipelineExecutorImpl.
      */
-    static public PipelineExecutorImpl getPipelineExecutorImpl(IParser parser, HashMap<String, String> params) {
+    static public PipelineExecutorImpl getPipelineExecutorImpl(IParser parser,
+                                                               HashMap<String, String> params,
+                                                               ISubstitute substitutor) {
         if (executor == null) {
-            executor = new PipelineExecutorImpl(parser, params);
+            executor = new PipelineExecutorImpl(parser, params, substitutor);
         }
         return executor;
     }
 
 
+    @Override
+    public boolean isFinished() {
+        return isFinished;
+    }
 
     @Override
-    public void execute(String inputString) {
-        parser.substitute("inputString", globalArgs);
-        List<ICommand> commands = parser.parse();
-
+    public Stream execute(String inputString) {
+        String inputWithArgs = substitutor.substitute("inputString", globalArgs);
+        List<ICommand> commands = parser.parse(inputWithArgs);
+        Stream curStream = new StreamImpl();
         for (ICommand command : commands) {
-            command.execute();
+            if (command instanceof ExitCommand) {
+                isFinished = true;
+                break;
+            }
+            command.execute(curStream);
         }
-
+        return curStream;
     }
 }
