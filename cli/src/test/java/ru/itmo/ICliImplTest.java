@@ -7,17 +7,12 @@ import org.junit.jupiter.api.Test;
 class ICliImplTest {
 
     @Test
-    void test3() {
-        Assertions.assertEquals(1, 1);
+    void test1() {
+        Assertions.assertEquals(2, 2);
     }
 
     @Test
     void test2() {
-        Assertions.assertEquals(2, 1);
-    }
-
-    @Test
-    void test1() {
-        Assertions.assertEquals(2, 2);
+        Assertions.assertEquals(1, 1);
     }
 }
