@@ -3,7 +3,12 @@
 
 ## Установка и использование
 
-todo
+1. ./gradlew buildExecutable
+2. cd ./cli/build/install/cli
+3. В /bin - cli и cli.bat
+4. В /lib - cli-1.0-SNAPSHOT.jar
+5. cli и cli.bat можно запустить из командной строки ./cli
+6. java -jar  cli-1.0-SNAPSHOT.jar
 
 ## Описание функций
 Поддерживает:
