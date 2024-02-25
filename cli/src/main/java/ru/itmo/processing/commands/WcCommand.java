@@ -1,14 +1,12 @@
 package ru.itmo.processing.commands;
 
+import java.io.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import ru.itmo.streams.StreamImpl;
+import ru.itmo.utils.StreamDescriptor;
 
 public class WcCommand  implements ICommand {
     private List<String> args_;
@@ -74,7 +72,7 @@ public class WcCommand  implements ICommand {
     /**
      * Set flags of command wc
      *
-     * @param args set new flags for command wc
+     * @param flags set new flags for command wc
      *
      */
     public void setFlags_(List<String> flags) {
@@ -86,10 +84,11 @@ public class WcCommand  implements ICommand {
     }
 
     public void setValueFromKey(String key, Integer value){
-        dataMap.set(key, value);
+        dataMap.put(key, value);
     }
 
     private String check_valid_flags(List<String> flags_){
+        List<String> validFlags = Arrays.asList("-l", "-w", "-c", "-m");
         for (String flag: flags_){
             if (!validFlags.contains(flag)){
                 return flag;
@@ -99,7 +98,7 @@ public class WcCommand  implements ICommand {
     }
 
     @Override
-    public void execute(Stream stream){
+    public Stream execute(Stream stream){
         /*
         Если я передаю аргументы команде, то я игнорирую поток данных и
         обрабатываю уже файлы (в цикле, поскольку аргументов может быть
@@ -115,18 +114,18 @@ public class WcCommand  implements ICommand {
         ошибка потом уже вывод total
          */
 
-        if (check_valid_flags(this.flags_) != ""){
-            String res = "wc: неверный ключ — " ++ check_valid_flags(this.flags_);
-            stream.remove();
-            stream.add(res);
-            return;
+        if (!check_valid_flags(this.flags_).isEmpty()){
+            String res = "wc: неверный ключ — " + check_valid_flags(this.flags_);
+//            stream.remove(StreamDescriptor.ERROR);
+            stream.put(res, StreamDescriptor.ERROR, true);
+            return stream;
         }
 
         if (args_.isEmpty()) {
-            this.args_ = stream.getData();
+            this.args_ = stream.get(StreamDescriptor.OUTPUT);
         }
 
-        stream.remove();
+        stream.remove(StreamDescriptor.OUTPUT);
         for (String filename : args_){
             try{
                 File file = new File(filename);
@@ -143,36 +142,38 @@ public class WcCommand  implements ICommand {
                 while ((line = br.readLine()) != null){
                     curDataMap.put("lineCount", curDataMap.get("lineCount") + 1);
                     curDataMap.put("byteCount", curDataMap.get("byteCount") + line.getBytes().length);
-                    curDataMap.put("charCount", curDataMap.get("charCount") + line.length);
+                    curDataMap.put("charCount", curDataMap.get("charCount") + line.length());
 
-                    List<String> words = line.split("\\s+");
-                    curDataMap.put("wordCount", curDataMap.get("wordCount") + words.length);
+                    List<String> words = List.of(line.split("\\s+"));
+                    curDataMap.put("wordCount", curDataMap.get("wordCount") + words.toArray().length);
                 }
 
                 String result_iteration = create_string(this.flags_, curDataMap) + filename;
-                stream.add(result_iteration);
+                stream.put(result_iteration, StreamDescriptor.OUTPUT, false);
 
-                dataMap.put("totalLineCount", dataMap.get("totalLineCount") + lineCount);
-                dataMap.put("totalWordCount", dataMap.get("totalWordCount") + wordCount);
-                dataMap.put("totalByteCount", dataMap.get("totalByteCount") + byteCount);
-                dataMap.put("totalCharCount", dataMap.get("totalCharCount") + charCount);
+                dataMap.put("totalLineCount", dataMap.get("totalLineCount") + curDataMap.get("lineCount"));
+                dataMap.put("totalWordCount", dataMap.get("totalWordCount") + curDataMap.get("wordCount"));
+                dataMap.put("totalByteCount", dataMap.get("totalByteCount") + curDataMap.get("byteCount"));
+                dataMap.put("totalCharCount", dataMap.get("totalCharCount") + curDataMap.get("charCount"));
 
             } catch (FileNotFoundException e) {
 
-                Strind exception_text = "wc: " + filename + ": Нет такого файла или каталога";
-                stream.add(exception_text);
+                String exception_text = "wc: " + filename + ": Нет такого файла или каталога";
+                stream.put(exception_text, StreamDescriptor.ERROR, false);
 
-            } //Можно ловить еще ошибки по типу отсутствия доступа к файлу
+            } catch (Exception e) {
+                stream.put("SORRY", StreamDescriptor.ERROR, false);
+            }//Можно ловить еще ошибки по типу отсутствия доступа к файлу
         }
         String result_iteration = create_string(this.flags_, this.dataMap) + "итого";
-        stream.add(result_iteration);
-        return;
+        stream.put(result_iteration, StreamDescriptor.OUTPUT, false);
+        return stream;
     }
 
     private String create_string(List<String> flags_, HashMap<String, Integer> map_){
         String res = "";
         if (flags_.isEmpty()){
-            String res += String.valueOf(map_.get("lineCount")) + " " + String.valueOf(map_.get("wordCount")) + " " + String.valueOf(map_.get("byteCount"));
+            res += String.valueOf(map_.get("lineCount")) + " " + String.valueOf(map_.get("wordCount")) + " " + String.valueOf(map_.get("byteCount"));
             return res;
         }
 
