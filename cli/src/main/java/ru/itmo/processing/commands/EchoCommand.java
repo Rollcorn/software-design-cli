@@ -1,6 +1,7 @@
 package ru.itmo.processing.commands;
 
 import ru.itmo.streams.Stream;
+import ru.itmo.utils.StreamDescriptor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,8 @@ public class EchoCommand implements ICommand {
 
     @Override
     public void execute(Stream stream1) {
-        // TODO: implement (9((
+        // TODO: flags
+        String result = String.join(" ", this.args_) + "\n";
+        stream1.put(result, StreamDescriptor.OUTPUT, true);
     }
 }
