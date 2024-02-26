@@ -1,5 +1,7 @@
 package ru.itmo.processing.parser;
 
+import ru.itmo.processing.commands.ExitCommand;
+import ru.itmo.processing.commands.ExternalCommand;
 import ru.itmo.processing.commands.ICommand;
 
 import java.util.List;
@@ -67,13 +69,26 @@ public class ParserSimple implements IParser {
             token_groups.add(currentGroup);
         }
 
+        List<ICommand> commands = new ArrayList<>();
+
         for (List<String> group: token_groups){
-            System.out.println(String.join("+", group));
+            switch (group.get(0)){
+                case "exit": commands.add(new ExitCommand());
+                    break;
+                case "pwd":
+                    break;
+                case "echo":
+                    break;
+                case "wc":
+                    break;
+                default: commands.add(new ExternalCommand());
+                    break;
+            }
         }
 
 
 
-        return null;
+        return commands;
     }
 }
 
