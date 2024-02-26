@@ -1,6 +1,9 @@
 package ru.itmo.processing.parser;
 
-import ru.itmo.processing.commands.*;
+import ru.itmo.processing.commands.EchoCommand;
+import ru.itmo.processing.commands.ExitCommand;
+import ru.itmo.processing.commands.ICommand;
+import ru.itmo.processing.commands.PwdCommand;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,7 +1,11 @@
 package ru.itmo.processing.parser;
 
 import org.junit.jupiter.api.Test;
-import ru.itmo.processing.commands.*;
+import ru.itmo.processing.commands.EchoCommand;
+import ru.itmo.processing.commands.ExitCommand;
+import ru.itmo.processing.commands.ExternalCommand;
+import ru.itmo.processing.commands.ICommand;
+import ru.itmo.processing.commands.PwdCommand;
 
 import java.util.List;
 
@@ -27,6 +31,5 @@ class ParserSimpleTest {
         result = p.parse(test_case);
         assertInstanceOf(EchoCommand.class, result.get(0));
         assertInstanceOf(PwdCommand.class, result.get(1));
-
     }
 }
