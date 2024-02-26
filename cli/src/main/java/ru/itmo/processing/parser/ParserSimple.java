@@ -46,7 +46,33 @@ public class ParserSimple implements IParser {
     }
 
     @Override
-    public List<ICommand> parse(String tokens) {
+    public List<ICommand> parse(String command) {
+        List<String> tokens = tokenizeString(command);
+
+        List<List<String>> token_groups = new ArrayList<>();
+        List<String> currentGroup = new ArrayList<>();
+
+        for (String token : tokens) {
+            if ("|".equals(token)) {
+                if (!currentGroup.isEmpty()) {
+                    token_groups.add(currentGroup);
+                    currentGroup = new ArrayList<>();
+                }
+            } else {
+                currentGroup.add(token);
+            }
+        }
+
+        if (!currentGroup.isEmpty()) {
+            token_groups.add(currentGroup);
+        }
+
+        for (List<String> group: token_groups){
+            System.out.println(String.join("+", group));
+        }
+
+
+
         return null;
     }
 }
