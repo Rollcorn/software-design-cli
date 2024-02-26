@@ -1,12 +1,13 @@
 package ru.itmo.processing.commands;
 
-import java.io.*;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
-import ru.itmo.streams.StreamImpl;
+import ru.itmo.streams.Stream;
 import ru.itmo.utils.StreamDescriptor;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 public class WcCommand  implements ICommand {
     private List<String> args_;
@@ -28,7 +29,8 @@ public class WcCommand  implements ICommand {
 
     /**
      * Create new object WcCommand with params
-     * @param args argiments of command wc
+     *
+     * @param args  arguments of command wc
      * @param flags flags of command wc
      */
     public WcCommand(List<String> args, List<String> flags){
@@ -98,16 +100,16 @@ public class WcCommand  implements ICommand {
     }
 
     @Override
-    public Stream execute(Stream stream){
+    public void execute(Stream stream) {
         /*
         Если я передаю аргументы команде, то я игнорирую поток данных и
         обрабатываю уже файлы (в цикле, поскольку аргументов может быть
-        больше 1го. При этом необходимо, чтобы в конце в поток было записано
-        общее количество посчитанных данных
+        больше одного. При этом необходимо, чтобы в конце в поток было записано
+        общее количество посчитанных данных)
         Если у меня нет аргументов, то я беру данные из потока для анализа
         При этом я считаю сразу все, а потом уже в зависимости от флагов
         буду записывать в поток то, что нужно.
-        При этом если файлов для анализа больше 1го, то в цикле я каждый
+        При этом если файлов для анализа больше одного, то в цикле я каждый
         раз делаю запись в поток данных, что получили. При этом, если файл
         не открылся в цикле, то его ошибку записываем в поток все равно,
         поэтому может получиться так, что идет строка норм с выводом, потом
@@ -118,11 +120,11 @@ public class WcCommand  implements ICommand {
             String res = "wc: неверный ключ — " + check_valid_flags(this.flags_);
 //            stream.remove(StreamDescriptor.ERROR);
             stream.put(res, StreamDescriptor.ERROR, true);
-            return stream;
+//            return stream;
         }
 
         if (args_.isEmpty()) {
-            this.args_ = stream.get(StreamDescriptor.OUTPUT);
+            this.args_.add(stream.get(StreamDescriptor.OUTPUT));
         }
 
         stream.remove(StreamDescriptor.OUTPUT);
@@ -167,27 +169,27 @@ public class WcCommand  implements ICommand {
         }
         String result_iteration = create_string(this.flags_, this.dataMap) + "итого";
         stream.put(result_iteration, StreamDescriptor.OUTPUT, false);
-        return stream;
+//        return stream;
     }
 
     private String create_string(List<String> flags_, HashMap<String, Integer> map_){
         String res = "";
         if (flags_.isEmpty()){
-            res += String.valueOf(map_.get("lineCount")) + " " + String.valueOf(map_.get("wordCount")) + " " + String.valueOf(map_.get("byteCount"));
+            res += map_.get("lineCount") + " " + map_.get("wordCount") + " " + map_.get("byteCount");
             return res;
         }
 
         if (flags_.contains("-l")){
-            res += String.valueOf(map_.get("lineCount")) + " ";
+            res += map_.get("lineCount") + " ";
         }
         if (flags_.contains("-w")) {
-            res += String.valueOf(map_.get("wordCount")) + " ";
+            res += map_.get("wordCount") + " ";
         }
         if (flags_.contains("-c")) {
-            res += String.valueOf(map_.get("byteCount")) + " ";
+            res += map_.get("byteCount") + " ";
         }
         if (flags_.contains("-m")) {
-            res += String.valueOf(map_.get("charCount")) + " ";
+            res += map_.get("charCount") + " ";
         }
         return res;
     }

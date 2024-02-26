@@ -1,16 +1,15 @@
 package ru.itmo.processing.commands;
 
-import java.io.*;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.HashMap;
-import java.util.stream.Collectors;
-import ru.itmo.streams.StreamImpl;
+import ru.itmo.streams.Stream;
 import ru.itmo.utils.StreamDescriptor;
 
-public class CatCommand {
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
+
+public class CatCommand implements ICommand {
     private List<String> args_;
     private List<String> flag_;
 
@@ -63,11 +62,11 @@ public class CatCommand {
     }
 
     @Override
-    public Stream execute(Stream stream) {
+    public void execute(Stream stream) {
         if (!check_valid_flags(this.flag_).isEmpty()) {
             String res = "cat: неверный ключ — " + check_valid_flags(this.flag_);
             stream.put(res, StreamDescriptor.ERROR, false);
-            return stream;
+//            return stream;
         }
 
         if (this.args_.isEmpty()) {
@@ -110,6 +109,6 @@ public class CatCommand {
                 }
             }
         }
-        return stream;
+//        return stream;
     }
 }
