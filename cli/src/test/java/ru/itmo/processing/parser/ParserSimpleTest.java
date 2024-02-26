@@ -1,5 +1,8 @@
 package ru.itmo.processing.parser;
 
+import org.junit.jupiter.api.Assertions;
+import ru.itmo.processing.commands.ExitCommand;
+import ru.itmo.processing.commands.ExternalCommand;
 import org.junit.jupiter.api.Test;
 import ru.itmo.processing.commands.EchoCommand;
 import ru.itmo.processing.commands.ExitCommand;

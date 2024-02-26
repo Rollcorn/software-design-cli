@@ -103,6 +103,9 @@ public class ParserSimple implements IParser {
                     break;
             }
         }
+
+
+
         return commands;
     }
 }
