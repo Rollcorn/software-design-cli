@@ -4,7 +4,6 @@ package ru.itmo.processing;
 import ru.itmo.processing.commands.ExitCommand;
 import ru.itmo.processing.commands.IChangeContext;
 import ru.itmo.processing.commands.ICommand;
-import ru.itmo.processing.commands.VarCommand;
 import ru.itmo.processing.parser.IParser;
 import ru.itmo.processing.parser.ISubstitute;
 import ru.itmo.streams.Stream;
