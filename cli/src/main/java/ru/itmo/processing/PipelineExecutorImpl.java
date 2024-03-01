@@ -8,6 +8,7 @@ import ru.itmo.processing.parser.ISubstitute;
 import ru.itmo.streams.Stream;
 import ru.itmo.streams.StreamImpl;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +64,7 @@ public class PipelineExecutorImpl implements IPipelineExecutor {
     }
 
     @Override
-    public Stream execute(String inputString) {
+    public Stream execute(String inputString) throws IOException {
         String inputWithArgs = substitutor.substitute("inputString", globalArgs);
         List<ICommand> commands = parser.parse(inputWithArgs);
         Stream curStream = new StreamImpl();
