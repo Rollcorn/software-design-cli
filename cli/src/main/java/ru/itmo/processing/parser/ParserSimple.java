@@ -1,5 +1,7 @@
 package ru.itmo.processing.parser;
 
+import ru.itmo.processing.commands.CatCommand;
+import ru.itmo.processing.commands.EchoCommand;
 import ru.itmo.processing.commands.ExitCommand;
 import ru.itmo.processing.commands.ExternalCommand;
 import ru.itmo.processing.commands.ICommand;
@@ -53,15 +55,14 @@ public class ParserSimple implements IParser {
 
     @Override
     public List<ICommand> parse(String command) {
+        List<List<String>> tokenGroups = new ArrayList<>();
+
         List<String> tokens = tokenizeString(command);
-
-        List<List<String>> token_groups = new ArrayList<>();
         List<String> currentGroup = new ArrayList<>();
-
         for (String token : tokens) {
             if ("|".equals(token)) {
                 if (!currentGroup.isEmpty()) {
-                    token_groups.add(currentGroup);
+                    tokenGroups.add(currentGroup);
                     currentGroup = new ArrayList<>();
                 }
             } else {
@@ -70,12 +71,12 @@ public class ParserSimple implements IParser {
         }
 
         if (!currentGroup.isEmpty()) {
-            token_groups.add(currentGroup);
+            tokenGroups.add(currentGroup);
         }
 
         List<ICommand> commands = new ArrayList<>();
 
-        for (List<String> group : token_groups) {
+        for (List<String> group : tokenGroups) {
             switch (group.get(0)) {
                 case "exit":
                     commands.add(new ExitCommand());

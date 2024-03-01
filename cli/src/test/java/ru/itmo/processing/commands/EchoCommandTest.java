@@ -16,8 +16,7 @@ class EchoCommandTest {
     @Test
     void execute_params_simple() {
         List<String> args = Arrays.asList("foo", "bar");
-        List<String> flags = new ArrayList<>();
-        ICommand echo = new EchoCommand (args, flags);
+        ICommand echo = new EchoCommand (args);
         Stream stream1 = new StreamImpl();
         echo.execute(stream1);
         assertEquals("foo bar\n", stream1.get(StreamDescriptor.OUTPUT));
