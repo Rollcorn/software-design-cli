@@ -100,10 +100,8 @@ public class CatCommand implements ICommand {
                     }
 
                 } catch (FileNotFoundException e) {
-
                     String exception_text = "cat: " + filename + ": Нет такого файла или каталога";
                     stream.put(exception_text, StreamDescriptor.ERROR, false);
-
                 } catch (Exception e) {
                     stream.put("SORRY", StreamDescriptor.ERROR, false);
                 }

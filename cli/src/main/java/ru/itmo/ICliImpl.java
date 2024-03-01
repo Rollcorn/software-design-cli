@@ -7,6 +7,7 @@ import ru.itmo.processing.parser.ParserSimple;
 import ru.itmo.processing.parser.SubstituteSimple;
 import ru.itmo.streams.Stream;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -14,7 +15,7 @@ public class ICliImpl implements ICli {
     IParser parser;
 
     @Override
-    public void run() {
+    public void run() throws IOException {
         // ExternService -> getGlobalArgs -> executeGlobalProgram
         HashMap<String, String> globalArgs = new HashMap<>();
         globalArgs.put("path", "$PATH:/some/path");
