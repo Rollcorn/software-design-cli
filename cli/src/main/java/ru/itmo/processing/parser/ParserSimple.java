@@ -2,8 +2,10 @@ package ru.itmo.processing.parser;
 
 import ru.itmo.processing.commands.EchoCommand;
 import ru.itmo.processing.commands.ExitCommand;
+import ru.itmo.processing.commands.ExternalCommand;
 import ru.itmo.processing.commands.ICommand;
 import ru.itmo.processing.commands.PwdCommand;
+import ru.itmo.processing.commands.VarCommand;
 
 import java.util.ArrayList;
 import java.util.List;
