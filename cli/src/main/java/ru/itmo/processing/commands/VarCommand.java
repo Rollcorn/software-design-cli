@@ -2,7 +2,9 @@ package ru.itmo.processing.commands;
 
 import ru.itmo.streams.Stream;
 
-public class VarCommand implements ICommand {
+import java.util.Map;
+
+public class VarCommand implements ICommand, IChangeContext {
     final private String name;
     final private String value;
 
@@ -13,6 +15,11 @@ public class VarCommand implements ICommand {
 
     @Override
     public void execute(Stream stream1) {
+        // TODO
+    }
 
+    @Override
+    public void modifyContext(Map<String, String> agrs) {
+        // TODO
     }
 }
