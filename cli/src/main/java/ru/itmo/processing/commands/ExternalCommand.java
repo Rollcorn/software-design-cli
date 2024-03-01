@@ -2,14 +2,15 @@ package ru.itmo.processing.commands;
 
 import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;
+import java.util.List;
 
 import ru.itmo.streams.Stream;
 
 public class ExternalCommand implements ICommand{
 
-    private String[] args;
+    private List<String> args;
 
-    public ExternalCommand(String[] args) {
+    public ExternalCommand(List<String> args) {
         this.args = args;
     }
 

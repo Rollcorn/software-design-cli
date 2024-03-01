@@ -1,16 +1,17 @@
 package ru.itmo.processing.parser;
 
+import org.junit.jupiter.api.Test;
 import ru.itmo.processing.commands.*;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
+
 class ParserSimpleTest {
 
-    @org.junit.jupiter.api.Test
+    @Test
     void parse() {
-        System.out.println("--Test tokens--");
         IParser p = new ParserSimple();
 
         String test_case = "ls | exit";
