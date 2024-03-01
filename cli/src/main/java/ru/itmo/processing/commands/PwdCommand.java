@@ -1,6 +1,7 @@
 package ru.itmo.processing.commands;
 
 import ru.itmo.streams.Stream;
+import ru.itmo.utils.StreamDescriptor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,12 @@ public class PwdCommand implements ICommand {
 
     @Override
     public void execute(Stream stream1) {
-        // TODO: implement (9(((
+
+        // Get working dir
+        String userDirectory = System.getProperty("user.dir");
+
+        // Put result to stream
+        stream1.put(userDirectory, StreamDescriptor.OUTPUT, true);
+        // TODO: remove StreamDescriptor.ERROR????
     }
 }
