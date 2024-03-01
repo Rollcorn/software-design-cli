@@ -1,9 +1,11 @@
 package ru.itmo.processing.parser;
 
-import ru.itmo.processing.commands.ICommand;
+import ru.itmo.processing.commands.*;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ParserSimple implements IParser {
     private List<String> tokenizeString(String command) {
@@ -46,8 +48,59 @@ public class ParserSimple implements IParser {
     }
 
     @Override
-    public List<ICommand> parse(String tokens) {
-        return null;
+    public List<ICommand> parse(String command) {
+        List<String> tokens = tokenizeString(command);
+
+        List<List<String>> token_groups = new ArrayList<>();
+        List<String> currentGroup = new ArrayList<>();
+
+        for (String token : tokens) {
+            if ("|".equals(token)) {
+                if (!currentGroup.isEmpty()) {
+                    token_groups.add(currentGroup);
+                    currentGroup = new ArrayList<>();
+                }
+            } else {
+                currentGroup.add(token);
+            }
+        }
+
+        if (!currentGroup.isEmpty()) {
+            token_groups.add(currentGroup);
+        }
+
+        List<ICommand> commands = new ArrayList<>();
+
+        for (List<String> group : token_groups) {
+            switch (group.get(0)) {
+                case "exit":
+                    commands.add(new ExitCommand());
+                    break;
+                case "pwd":
+                    commands.add(new PwdCommand());
+                    break;
+                case "echo":
+                    commands.add(new EchoCommand(group.subList(1, group.size())));
+                    break;
+                case "wc":
+                    break;
+                case "cat":
+                    break;
+                default:
+                    String regex = "(\\w+)=(\\w+)";
+                    Pattern pattern = Pattern.compile(regex);
+                    Matcher matcher = pattern.matcher(command);
+                    if (matcher.find()) {
+                        String name = matcher.group(1);
+                        String value = matcher.group(2);
+                        commands.add(new VarCommand(name, value));
+                    } else {
+                        commands.add(new ExternalCommand());
+                    }
+                    break;
+            }
+        }
+        return commands;
     }
 }
 
