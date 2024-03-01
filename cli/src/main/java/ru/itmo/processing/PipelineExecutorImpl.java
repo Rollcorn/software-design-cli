@@ -2,7 +2,9 @@ package ru.itmo.processing;
 
 
 import ru.itmo.processing.commands.ExitCommand;
+import ru.itmo.processing.commands.IChangeContext;
 import ru.itmo.processing.commands.ICommand;
+import ru.itmo.processing.commands.VarCommand;
 import ru.itmo.processing.parser.IParser;
 import ru.itmo.processing.parser.ISubstitute;
 import ru.itmo.streams.Stream;
@@ -18,13 +20,11 @@ public class PipelineExecutorImpl implements IPipelineExecutor {
     private ISubstitute substitutor;
     boolean isFinished;
 
-    /**
-     * Парсер для разбора команд.
-     */
+    //    Парсер для разбора команд.
     private final IParser parser;
-    /**
-     * Глобальные аргументы для выполнения пайплайна.
-     */
+
+
+    // Глобальные аргументы для выполнения пайплайна.
     private Map<String, String> globalArgs;
 //    private Stream stream; // мапа с потоками? | он назначается каждой команде?
 
@@ -73,6 +73,10 @@ public class PipelineExecutorImpl implements IPipelineExecutor {
                 isFinished = true;
                 break;
             }
+            if (command instanceof IChangeContext) {
+                ((IChangeContext) command).modifyContext(globalArgs);
+            }
+
             command.execute(curStream);
         }
         return curStream;

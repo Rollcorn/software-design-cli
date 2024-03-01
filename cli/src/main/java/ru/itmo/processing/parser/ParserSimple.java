@@ -1,6 +1,5 @@
 package ru.itmo.processing.parser;
 
-import ru.itmo.processing.commands.CatCommand;
 import ru.itmo.processing.commands.EchoCommand;
 import ru.itmo.processing.commands.ExitCommand;
 import ru.itmo.processing.commands.ExternalCommand;
@@ -105,7 +104,6 @@ public class ParserSimple implements IParser {
                     break;
             }
         }
-
 
 
         return commands;
