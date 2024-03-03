@@ -1,11 +1,6 @@
 package ru.itmo.processing.parser;
 
-import ru.itmo.processing.commands.EchoCommand;
-import ru.itmo.processing.commands.ExitCommand;
-import ru.itmo.processing.commands.ExternalCommand;
-import ru.itmo.processing.commands.ICommand;
-import ru.itmo.processing.commands.PwdCommand;
-import ru.itmo.processing.commands.VarCommand;
+import ru.itmo.processing.commands.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,8 +82,12 @@ public class ParserSimple implements IParser {
                     commands.add(new EchoCommand(group.subList(1, group.size())));
                     break;
                 case "wc":
+                    // TODO: Add constructor without flags
+                    commands.add(new WcCommand(group.subList(1, group.size()), new ArrayList<>()));
                     break;
                 case "cat":
+                    // TODO: Add constructor without flags
+                    commands.add(new CatCommand(group.subList(1, group.size()), new ArrayList<>()));
                     break;
                 default:
                     String regex = "(\\w+)=(\\w+)";

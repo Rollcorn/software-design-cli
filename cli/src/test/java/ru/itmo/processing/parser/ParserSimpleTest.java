@@ -1,13 +1,11 @@
 package ru.itmo.processing.parser;
 
 import org.junit.jupiter.api.Test;
+import ru.itmo.processing.commands.CatCommand;
 import ru.itmo.processing.commands.EchoCommand;
-import ru.itmo.processing.commands.ExitCommand;
-import ru.itmo.processing.commands.ExternalCommand;
-import org.junit.jupiter.api.Assertions;
-import ru.itmo.processing.commands.ExitCommand;
-import ru.itmo.processing.commands.ExternalCommand;
 import ru.itmo.processing.commands.ICommand;
+import ru.itmo.processing.commands.ExitCommand;
+import ru.itmo.processing.commands.ExternalCommand;
 import ru.itmo.processing.commands.PwdCommand;
 import ru.itmo.processing.commands.VarCommand;
 
@@ -35,5 +33,14 @@ class ParserSimpleTest {
         result = p.parse(test_case);
         assertInstanceOf(EchoCommand.class, result.get(0));
         assertInstanceOf(PwdCommand.class, result.get(1));
+
+        test_case = "a=10";
+        result = p.parse(test_case);
+        assertInstanceOf(VarCommand.class, result.get(0));
+
+        test_case = "echo \"This is a test\" | cat";
+        result = p.parse(test_case);
+        assertInstanceOf(EchoCommand.class, result.get(0));
+        assertInstanceOf(CatCommand.class, result.get(1));
     }
 }
