@@ -14,75 +14,59 @@ import java.util.HashMap;
 import java.util.List;
 
 public class WcCommand  implements ICommand {
-    private List<String> args_;
-    private List<String> flags_;
-    HashMap<String, Integer> dataMap;
+    private List<String> input;
+    private List<String> args;
+    private List<String> flags;
+    private HashMap<String, Integer> dataMap;
 
-    /**
-     * Create new object WcCommand without params
-     */
-    public WcCommand(){
-        this.args_ = new ArrayList<>();
-        this.flags_ = new ArrayList<>();
-        dataMap = new HashMap<>();
+    public WcCommand(List<String> input){
+        this.input = input;
+        this.args = new ArrayList<>();
+        this.flags = new ArrayList<>();
+        this.dataMap = new HashMap<>();
         dataMap.put("totalLineCount", 0);
         dataMap.put("totalWordCount", 0);
         dataMap.put("totalByteCount", 0);
         dataMap.put("totalCharCount", 0);
     }
 
-    /**
-     * Create new object WcCommand with params
-     *
-     * @param args  arguments of command wc
-     * @param flags flags of command wc
-     */
-    public WcCommand(List<String> args, List<String> flags){
-        this.args_ = args;
-        this.flags_ = flags;
-        dataMap = new HashMap<>();
-        dataMap.put("totalLineCount", 0);
-        dataMap.put("totalWordCount", 0);
-        dataMap.put("totalByteCount", 0);
-        dataMap.put("totalCharCount", 0);
+    public List<String> getInput() {
+        return input;
     }
 
-    /**
-     * Get arguments of command wc
-     *
-     * @return List(String)
-     */
-    public List<String> getArgs_() {
-        return args_;
+    public void setInput(List<String> input) {
+        this.input = input;
     }
 
-    /**
-     * Get flags of command wc
-     *
-     * @return List(String)
-     */
-    public List<String> getFlags_() {
-        return flags_;
+    public HashMap<String, Integer> getDataMap(){
+        return dataMap;
     }
 
-    /**
-     * Set arguments of command wc
-     *
-     * @param args set new arguments for command wc
-     *
-     */
-    public void setArgs_(List<String> args) {
-        this.args_ = args;
+    public void setDataMap(HashMap<String, Integer> dataMapNew){
+        this.dataMap = dataMapNew;
     }
 
-    /**
-     * Set flags of command wc
-     *
-     * @param flags set new flags for command wc
-     *
-     */
-    public void setFlags_(List<String> flags) {
-        this.flags_ = flags;
+    public List<String> getArgs() {
+        return args;
+    }
+    public void setArgs(List<String> argsNew){
+        this.args = argsNew;
+    }
+    public List<String> getFlags() {
+        return flags;
+    }
+    public void setFlags(List<String> flagsNew){
+        this.flags = flagsNew;
+    }
+
+    private void separateInput(){
+        for(String item: input){
+            if (item.startsWith("-")){
+                flags.add(item);
+            } else {
+                args.add(item);
+            }
+        }
     }
 
     public Integer getValueFromKey(String key){
@@ -90,12 +74,12 @@ public class WcCommand  implements ICommand {
     }
 
     public void setValueFromKey(String key, Integer value){
-        dataMap.put(key, value);
+        this.dataMap.put(key, value);
     }
 
-    private String check_valid_flags(List<String> flags_){
+    private String check_valid_flags(List<String> flags){
         List<String> validFlags = Arrays.asList("-l", "-w", "-c", "-m");
-        for (String flag: flags_){
+        for (String flag: flags){
             if (!validFlags.contains(flag)){
                 return flag;
             }
@@ -104,35 +88,21 @@ public class WcCommand  implements ICommand {
     }
 
     @Override
-    public void execute(Stream stream) {
-        /*
-        Если я передаю аргументы команде, то я игнорирую поток данных и
-        обрабатываю уже файлы (в цикле, поскольку аргументов может быть
-        больше одного. При этом необходимо, чтобы в конце в поток было записано
-        общее количество посчитанных данных)
-        Если у меня нет аргументов, то я беру данные из потока для анализа
-        При этом я считаю сразу все, а потом уже в зависимости от флагов
-        буду записывать в поток то, что нужно.
-        При этом если файлов для анализа больше одного, то в цикле я каждый
-        раз делаю запись в поток данных, что получили. При этом, если файл
-        не открылся в цикле, то его ошибку записываем в поток все равно,
-        поэтому может получиться так, что идет строка норм с выводом, потом
-        ошибка потом уже вывод total
-         */
+    public void execute(Stream stream){
+        separateInput();
 
-        if (!check_valid_flags(this.flags_).isEmpty()){
-            String res = "wc: неверный ключ — " + check_valid_flags(this.flags_);
-//            stream.remove(StreamDescriptor.ERROR);
+        if (!check_valid_flags(this.flags).isEmpty()){
+            String res = "wc: неверный ключ — " + check_valid_flags(this.flags);
             stream.put(res, StreamDescriptor.ERROR, true);
-//            return stream;
+            return;
         }
 
-        if (args_.isEmpty()) {
-            this.args_.add(stream.get(StreamDescriptor.OUTPUT));
+        if (args.isEmpty()) {
+            this.args.add(stream.get(StreamDescriptor.OUTPUT));
         }
 
         stream.remove(StreamDescriptor.OUTPUT);
-        for (String filename : args_){
+        for (String filename : args){
             try{
                 File file = new File(filename);
                 FileInputStream fis = new FileInputStream(file);
@@ -154,7 +124,7 @@ public class WcCommand  implements ICommand {
                     curDataMap.put("wordCount", curDataMap.get("wordCount") + words.toArray().length);
                 }
 
-                String result_iteration = create_string(this.flags_, curDataMap) + filename;
+                String result_iteration = create_string(this.flags, curDataMap) + filename;
                 stream.put(result_iteration, StreamDescriptor.OUTPUT, false);
 
                 dataMap.put("totalLineCount", dataMap.get("totalLineCount") + curDataMap.get("lineCount"));
@@ -171,19 +141,19 @@ public class WcCommand  implements ICommand {
                 stream.put("SORRY", StreamDescriptor.ERROR, false);
             }//Можно ловить еще ошибки по типу отсутствия доступа к файлу
         }
-        String result_iteration = create_string(this.flags_, this.dataMap) + "итого";
+        String result_iteration = create_string(this.flags, this.dataMap) + "итого";
         stream.put(result_iteration, StreamDescriptor.OUTPUT, false);
 //        return stream;
     }
 
-    private String create_string(List<String> flags_, HashMap<String, Integer> map_){
+    private String create_string(List<String> flags_, HashMap<String, Integer> map_) {
         String res = "";
-        if (flags_.isEmpty()){
+        if (flags_.isEmpty()) {
             res += map_.get("lineCount") + " " + map_.get("wordCount") + " " + map_.get("byteCount");
             return res;
         }
 
-        if (flags_.contains("-l")){
+        if (flags_.contains("-l")) {
             res += map_.get("lineCount") + " ";
         }
         if (flags_.contains("-w")) {

@@ -6,6 +6,7 @@ import ru.itmo.streams.Stream;
 import ru.itmo.utils.StreamDescriptor;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -15,7 +16,24 @@ import java.util.Scanner;
 @AllArgsConstructor
 public class CatCommand implements ICommand {
     private List<String> args;
-    private List<String> flag;
+    private List<String> flags;
+    private List<String> input;
+
+    public CatCommand(List<String> input){
+        this.input = input;
+        this.args = new ArrayList<>();
+        this.flags = new ArrayList<>();
+    }
+
+    private void separateInput(){
+        for(String item: input){
+            if (item.startsWith("-")){
+                flags.add(item);
+            } else {
+                args.add(item);
+            }
+        }
+    }
 
     private String checkValidFlags(List<String> flags) {
         List<String> validFlags = Arrays.asList("-b", "-n", "-e");
@@ -41,16 +59,15 @@ public class CatCommand implements ICommand {
 
     @Override
     public void execute(Stream stream) {
-        if (!checkValidFlags(this.flag).isEmpty()) {
-            String res = "cat: неверный ключ — " + checkValidFlags(this.flag);
+        separateInput();
+
+        if (!checkValidFlags(this.flags).isEmpty()) {
+            String res = "cat: неверный ключ — " + checkValidFlags(this.flags);
             stream.put(res, StreamDescriptor.ERROR, false);
-//            return stream;
+            return;
         }
 
         if (this.args.isEmpty()) {
-            //Просто выводим строку из Stream output
-//            this.args_ = stream.get(StreamDescriptor.OUTPUT);
-//            for (String word: this.args_){
             try (Scanner scanner = new Scanner(stream.get(StreamDescriptor.OUTPUT))) {
                 int i = 1;
                 while (scanner.hasNextLine()) {
@@ -58,7 +75,7 @@ public class CatCommand implements ICommand {
                     i++;
                 }
             } catch (Exception e) {
-                String res = "cat: что-то с текстом не то" + checkValidFlags(this.flag);
+                String res = "cat: что-то с текстом не то" + checkValidFlags(this.flags);
                 stream.put(res, StreamDescriptor.ERROR, false);
             }
 //            }
@@ -85,6 +102,5 @@ public class CatCommand implements ICommand {
                 }
             }
         }
-//        return stream;
     }
 }

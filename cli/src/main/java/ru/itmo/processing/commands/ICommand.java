@@ -5,5 +5,5 @@ import ru.itmo.streams.Stream;
 import java.io.IOException;
 
 public interface ICommand {
-    void execute(Stream stream) throws IOException;
+    void execute(Stream stream);
 }
