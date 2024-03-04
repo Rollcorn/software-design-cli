@@ -83,11 +83,11 @@ public class ParserSimple implements IParser {
                     break;
                 case "wc":
                     // TODO: Add constructor without flags
-                    commands.add(new WcCommand(group.subList(1, group.size()), new ArrayList<>()));
+                    commands.add(new WcCommand(group.subList(1, group.size())));
                     break;
                 case "cat":
                     // TODO: Add constructor without flags
-                    commands.add(new CatCommand(group.subList(1, group.size()), new ArrayList<>()));
+                    commands.add(new CatCommand(group.subList(1, group.size())));
                     break;
                 default:
                     String regex = "(\\w+)=(\\w+)";
