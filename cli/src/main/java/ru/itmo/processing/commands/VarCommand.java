@@ -15,11 +15,11 @@ public class VarCommand implements ICommand, IChangeContext {
 
     @Override
     public void execute(Stream stream1) {
-        // TODO
+        // TODO: Do nothing :)
     }
 
     @Override
     public void modifyContext(Map<String, String> agrs) {
-        // TODO
+        agrs.put(name, value);
     }
 }
