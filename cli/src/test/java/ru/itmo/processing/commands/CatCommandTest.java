@@ -23,7 +23,7 @@ class CatCommandTest {
 
     @Test
     void execute_simple_params_without_flags(){
-        List<String> input = List.of("example.txt");
+        List<String> input = List.of("/example.txt");
         ICommand cat = new CatCommand(input);
         Stream stream1 = new StreamImpl();
         cat.execute(stream1);

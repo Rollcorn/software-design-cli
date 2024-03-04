@@ -19,15 +19,15 @@ public class CatCommand implements ICommand {
     private List<String> flags;
     private List<String> input;
 
-    public CatCommand(List<String> input){
+    public CatCommand(List<String> input) {
         this.input = input;
         this.args = new ArrayList<>();
         this.flags = new ArrayList<>();
     }
 
-    private void separateInput(){
-        for(String item: input){
-            if (item.startsWith("-")){
+    private void separateInput() {
+        for (String item : input) {
+            if (item.startsWith("-")) {
                 flags.add(item);
             } else {
                 args.add(item);
@@ -78,20 +78,21 @@ public class CatCommand implements ICommand {
                 String res = "cat: что-то с текстом не то" + checkValidFlags(this.flags);
                 stream.put(res, StreamDescriptor.ERROR, false);
             }
-//            }
         } else {
             stream.remove(StreamDescriptor.OUTPUT);
             for (String filename : args) {
-                try {
-                    File file = new File(filename);
-                    FileInputStream fis = new FileInputStream(file);
-                    BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+                try (InputStream is = getClass().getResourceAsStream(filename);
+                     BufferedReader br = new BufferedReader(new InputStreamReader(is))
+                ) {
 
-                    String line;
+                    String line = br.readLine();
                     int i = 1;
-                    while ((line = br.readLine()) != null) {
-                        stream.put((Integer.toString(i) + line), StreamDescriptor.OUTPUT, false);
-                        i++;
+                    while (line != null) {
+                        stream.put(line, StreamDescriptor.OUTPUT, false);
+                        line = br.readLine();
+                        if (line != null) {
+                            stream.put("\n", StreamDescriptor.OUTPUT, false);
+                        }
                     }
 
                 } catch (FileNotFoundException e) {
