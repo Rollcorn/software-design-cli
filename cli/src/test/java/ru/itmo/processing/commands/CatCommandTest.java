@@ -34,13 +34,13 @@ class CatCommandTest {
 
     @Test
     void execute_simple_params_with_flags(){
-        List<String> input = Arrays.asList("-n", "example.txt");
+        List<String> input = Arrays.asList("-n", "/example.txt");
         ICommand cat = new CatCommand(input);
         Stream stream1 = new StreamImpl();
         cat.execute(stream1);
-        assertEquals("     1\thello, hi\n" +
-                "     2\tworld, Fedoooorrrr\n" +
-                "     3\t1 2 3 4 hi", stream1.get(StreamDescriptor.OUTPUT));
+        assertEquals("1\thello, hi\n" +
+                "2\tworld, Fedoooorrrr\n" +
+                "3\t    1 2 3 4 hi", stream1.get(StreamDescriptor.OUTPUT));
     }
 
     @Test
