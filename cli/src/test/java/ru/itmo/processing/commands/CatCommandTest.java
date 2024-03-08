@@ -27,9 +27,11 @@ class CatCommandTest {
         ICommand cat = new CatCommand(input);
         Stream stream1 = new StreamImpl();
         cat.execute(stream1);
-        assertEquals("hello, hi\n" +
-                "world, Fedoooorrrr\n" +
-                "    1 2 3 4 hi", stream1.get(StreamDescriptor.OUTPUT));
+        assertEquals("", stream1.get(StreamDescriptor.ERROR));
+        assertEquals("""
+                hello, hi
+                world, Fedoooorrrr
+                1 2 3 4 hi""", stream1.get(StreamDescriptor.OUTPUT));
     }
 
     @Test
@@ -38,9 +40,11 @@ class CatCommandTest {
         ICommand cat = new CatCommand(input);
         Stream stream1 = new StreamImpl();
         cat.execute(stream1);
-        assertEquals("1\thello, hi\n" +
-                "2\tworld, Fedoooorrrr\n" +
-                "3\t    1 2 3 4 hi", stream1.get(StreamDescriptor.OUTPUT));
+        assertEquals("", stream1.get(StreamDescriptor.ERROR));
+        assertEquals("""
+                1\thello, hi
+                2\tworld, Fedoooorrrr
+                3\t1 2 3 4 hi""", stream1.get(StreamDescriptor.OUTPUT));
     }
 
     @Test
@@ -51,4 +55,17 @@ class CatCommandTest {
         cat.execute(stream1);
         assertEquals("cat: dum.txt: Нет такого файла или каталога", stream1.get(StreamDescriptor.ERROR));
     }
+
+    @Test
+    void execute_with_nonempty_stream_without_args(){
+        List<String> input = List.of("");
+        ICommand cat = new CatCommand(input);
+        Stream stream = new StreamImpl();
+        stream.put("Hello ", StreamDescriptor.OUTPUT, false);
+        stream.put("Denis", StreamDescriptor.OUTPUT, false);
+        cat.execute(stream);
+        assertEquals("", stream.get(StreamDescriptor.ERROR));
+        assertEquals("Hello Denis\n", stream.get(StreamDescriptor.OUTPUT));
+    }
+
 }
