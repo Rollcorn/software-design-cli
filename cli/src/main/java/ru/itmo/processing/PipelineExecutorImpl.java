@@ -64,7 +64,7 @@ public class PipelineExecutorImpl implements IPipelineExecutor {
 
     @Override
     public Stream execute(String inputString) throws IOException {
-        String inputWithArgs = substitutor.substitute("inputString", globalArgs);
+        String inputWithArgs = substitutor.substitute(inputString, globalArgs);
         List<ICommand> commands = parser.parse(inputWithArgs);
         Stream curStream = new StreamImpl();
         for (ICommand command : commands) {
