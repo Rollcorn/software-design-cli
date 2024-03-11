@@ -8,13 +8,14 @@ import ru.itmo.utils.StreamDescriptor;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 class WcCommandTest {
 
     @Test
     void execute_wrong_flags(){
-        List<String> input = Arrays.asList("-aaa", "example.txt");
+        List<String> input = Arrays.asList("-aaa", "/example.txt");
         ICommand wc = new WcCommand(input);
         Stream stream = new StreamImpl();
         wc.execute(stream);
