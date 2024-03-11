@@ -17,7 +17,7 @@ subprojects {
         annotationProcessor("org.projectlombok:lombok:1.18.22")
     }
 
-    tasks.withType<Test> {
-        useJUnitPlatform()
-    }
+//    tasks.withType<Test> {
+//        useJUnitPlatform()
+//    }
 }

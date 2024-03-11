@@ -12,7 +12,8 @@ public class Main {
             System.out.println("Execution failed: " + e.getMessage());
             e.printStackTrace();
         } catch (Exception ignore) {
-            System.out.println("sorry" + ignore.getMessage());
+            System.out.println("Main fail: "+ ignore.getMessage());
+            ignore.printStackTrace();
         }
     }
 }

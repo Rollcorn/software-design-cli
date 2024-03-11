@@ -94,7 +94,7 @@ public class ParserSimple implements IParser {
                         String value = matcher.group(2);
                         commands.add(new VarCommand(name, value));
                     } else {
-                        commands.add(new ExternalCommand(group.subList(1, group.size())));
+                        commands.add(new ExternalCommand(group));
                     }
                     break;
             }
