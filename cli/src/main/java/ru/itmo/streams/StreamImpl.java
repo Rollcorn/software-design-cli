@@ -17,9 +17,10 @@ public class StreamImpl implements Stream {
     }
 
     public void put(String data, StreamDescriptor descriptor, Boolean isOverride) {
-        if (isOverride || !this.data.containsKey(descriptor)) {
-            this.data.put(descriptor, data);
+        if (Boolean.TRUE.equals(isOverride)) {
+            this.data.remove(descriptor);
         }
+        this.data.put(descriptor, this.data.getOrDefault(descriptor, "") + data);
     }
 
     public String get(StreamDescriptor descriptor) {

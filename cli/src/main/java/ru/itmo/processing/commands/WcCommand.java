@@ -1,88 +1,55 @@
 package ru.itmo.processing.commands;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.itmo.streams.Stream;
 import ru.itmo.utils.StreamDescriptor;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
+@Setter
+@Getter
+@NoArgsConstructor
 public class WcCommand  implements ICommand {
+
+    //Getters and setters
+    //Fields of class
     private List<String> input;
     private List<String> args;
     private List<String> flags;
     private HashMap<String, Integer> dataMap;
 
+    //Constructor
     public WcCommand(List<String> input){
         this.input = input;
         this.args = new ArrayList<>();
         this.flags = new ArrayList<>();
         this.dataMap = new HashMap<>();
-        dataMap.put("totalLineCount", 0);
-        dataMap.put("totalWordCount", 0);
-        dataMap.put("totalByteCount", 0);
-        dataMap.put("totalCharCount", 0);
+        dataMap.put("lineCount", 0);
+        dataMap.put("wordCount", 0);
+        dataMap.put("byteCount", 0);
+        dataMap.put("charCount", 0);
     }
 
-    public List<String> getInput() {
-        return input;
-    }
+    public Integer getValueFromKey(String key){ return dataMap.get(key); }
 
-    public void setInput(List<String> input) {
-        this.input = input;
-    }
+    public void setValueFromKey(String key, Integer value){ this.dataMap.put(key, value); }
 
-    public HashMap<String, Integer> getDataMap(){
-        return dataMap;
-    }
-
-    public void setDataMap(HashMap<String, Integer> dataMapNew){
-        this.dataMap = dataMapNew;
-    }
-
-    public List<String> getArgs() {
-        return args;
-    }
-    public void setArgs(List<String> argsNew){
-        this.args = argsNew;
-    }
-    public List<String> getFlags() {
-        return flags;
-    }
-    public void setFlags(List<String> flagsNew){
-        this.flags = flagsNew;
-    }
-
+    //Methods
     private void separateInput(){
         for(String item: input){
-            if (item.startsWith("-")){
-                flags.add(item);
-            } else {
-                args.add(item);
+            if (item.startsWith("-")){ flags.add(item);
             }
+            else { args.add(item); }
         }
-    }
-
-    public Integer getValueFromKey(String key){
-        return dataMap.get(key);
-    }
-
-    public void setValueFromKey(String key, Integer value){
-        this.dataMap.put(key, value);
     }
 
     private String check_valid_flags(List<String> flags){
         List<String> validFlags = Arrays.asList("-l", "-w", "-c", "-m");
         for (String flag: flags){
-            if (!validFlags.contains(flag)){
-                return flag;
-            }
+            if (!validFlags.contains(flag)){ return flag; }
         }
         return "";
     }
@@ -97,74 +64,113 @@ public class WcCommand  implements ICommand {
             return;
         }
 
-        if (args.isEmpty()) {
-            this.args.add(stream.get(StreamDescriptor.OUTPUT));
+        if (args.isEmpty() || Objects.equals(args.get(0), "")) {
+            args.clear();
+            args.add(stream.get(StreamDescriptor.OUTPUT));
+            readDataStream(stream);
         }
+        else { readDataInputFile(stream); }
+    }
+
+    private HashMap<String, Integer> createNewHashMap(){
+        HashMap<String, Integer> curDataMap = new HashMap<>();
+        curDataMap.put("lineCount", 0);
+        curDataMap.put("wordCount", 0);
+        curDataMap.put("byteCount", 0);
+        curDataMap.put("charCount", 0);
+        return curDataMap;
+    }
+
+    private void updateHashMap(HashMap<String, Integer> curDataMap, String line){
+        curDataMap.put("lineCount", curDataMap.get("lineCount") + 1);
+        curDataMap.put("byteCount", curDataMap.get("byteCount") + line.getBytes().length);
+        curDataMap.put("charCount", curDataMap.get("charCount") + line.length());
+
+        List<String> words = List.of(line.split("\\s+"));
+        curDataMap.put("wordCount", curDataMap.get("wordCount") + words.toArray().length);
+    }
+
+    private void updateHashMap(HashMap<String, Integer> dataMap, HashMap<String, Integer> curDataMap){
+        dataMap.put("lineCount", dataMap.get("lineCount") + curDataMap.get("lineCount"));
+        dataMap.put("wordCount", dataMap.get("wordCount") + curDataMap.get("wordCount"));
+        dataMap.put("byteCount", dataMap.get("byteCount") + curDataMap.get("byteCount"));
+        dataMap.put("charCount", dataMap.get("charCount") + curDataMap.get("charCount"));
+    }
+
+    private void readDataStream(Stream stream){
 
         stream.remove(StreamDescriptor.OUTPUT);
+
+        try (BufferedReader br = new BufferedReader(new StringReader(args.get(0)))) {
+
+            String line;
+            HashMap<String, Integer> curDataMap = createNewHashMap();
+
+            while ((line = br.readLine()) != null) {
+                updateHashMap(curDataMap, line);
+
+                String resultIteration = create_string(this.flags, curDataMap);
+                stream.put(resultIteration, StreamDescriptor.OUTPUT, false);
+            }
+
+        } catch (IOException e) {
+            stream.put(e.getMessage(), StreamDescriptor.ERROR, true);
+        }
+    }
+
+    private void readDataInputFile(Stream stream){
+        stream.remove(StreamDescriptor.OUTPUT);
         for (String filename : args){
-            try{
-                File file = new File(filename);
-                FileInputStream fis = new FileInputStream(file);
-                BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+            try (InputStream is = getClass().getResourceAsStream(filename)) {
 
-                HashMap<String, Integer> curDataMap = new HashMap<>();
-                curDataMap.put("lineCount", 0);
-                curDataMap.put("wordCount", 0);
-                curDataMap.put("byteCount", 0);
-                curDataMap.put("charCount", 0);
-
-                String line;
-                while ((line = br.readLine()) != null){
-                    curDataMap.put("lineCount", curDataMap.get("lineCount") + 1);
-                    curDataMap.put("byteCount", curDataMap.get("byteCount") + line.getBytes().length);
-                    curDataMap.put("charCount", curDataMap.get("charCount") + line.length());
-
-                    List<String> words = List.of(line.split("\\s+"));
-                    curDataMap.put("wordCount", curDataMap.get("wordCount") + words.toArray().length);
+                if (is == null) {
+                    throw new FileNotFoundException();
                 }
 
-                String result_iteration = create_string(this.flags, curDataMap) + filename;
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+
+                String line;
+                HashMap<String, Integer> curDataMap = createNewHashMap();
+
+                while ((line = reader.readLine()) != null){
+                    updateHashMap(curDataMap, line);
+                }
+
+                String result_iteration = create_string(this.flags, curDataMap) + " " + filename + "\n";
                 stream.put(result_iteration, StreamDescriptor.OUTPUT, false);
 
-                dataMap.put("totalLineCount", dataMap.get("totalLineCount") + curDataMap.get("lineCount"));
-                dataMap.put("totalWordCount", dataMap.get("totalWordCount") + curDataMap.get("wordCount"));
-                dataMap.put("totalByteCount", dataMap.get("totalByteCount") + curDataMap.get("byteCount"));
-                dataMap.put("totalCharCount", dataMap.get("totalCharCount") + curDataMap.get("charCount"));
+                updateHashMap(dataMap, curDataMap);
 
             } catch (FileNotFoundException e) {
 
                 String exception_text = "wc: " + filename + ": Нет такого файла или каталога";
                 stream.put(exception_text, StreamDescriptor.ERROR, false);
+                return;
 
             } catch (Exception e) {
                 stream.put("SORRY", StreamDescriptor.ERROR, false);
-            }//Можно ловить еще ошибки по типу отсутствия доступа к файлу
+                return;
+            }
         }
-        String result_iteration = create_string(this.flags, this.dataMap) + "итого";
-        stream.put(result_iteration, StreamDescriptor.OUTPUT, false);
-//        return stream;
+        if (args.size() > 1){
+            String result_iteration = create_string(this.flags, this.dataMap) + " итого\n";
+            stream.put(result_iteration, StreamDescriptor.OUTPUT, false);
+        }
     }
 
     private String create_string(List<String> flags_, HashMap<String, Integer> map_) {
         String res = "";
+
         if (flags_.isEmpty()) {
             res += map_.get("lineCount") + " " + map_.get("wordCount") + " " + map_.get("byteCount");
             return res;
         }
 
-        if (flags_.contains("-l")) {
-            res += map_.get("lineCount") + " ";
-        }
-        if (flags_.contains("-w")) {
-            res += map_.get("wordCount") + " ";
-        }
-        if (flags_.contains("-c")) {
-            res += map_.get("byteCount") + " ";
-        }
-        if (flags_.contains("-m")) {
-            res += map_.get("charCount") + " ";
-        }
+        if (flags_.contains("-l")) { res += map_.get("lineCount"); }
+        if (flags_.contains("-w")) { res += map_.get("wordCount"); }
+        if (flags_.contains("-c")) { res += map_.get("byteCount"); }
+        if (flags_.contains("-m")) { res += map_.get("charCount"); }
+
         return res;
     }
 }

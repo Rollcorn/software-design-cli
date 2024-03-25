@@ -16,11 +16,9 @@ public class ICliImpl implements ICli {
 
     @Override
     public void run() throws IOException {
-        // ExternService -> getGlobalArgs -> executeGlobalProgram
         HashMap<String, String> globalArgs = new HashMap<>();
         globalArgs.put("path", "$PATH:/some/path");
 
-        // читаем вход в цикле до 'exit'
         IPipelineExecutor pipelineExecutor = PipelineExecutorImpl.getPipelineExecutorImpl(
                 new ParserSimple(),
                 globalArgs,
@@ -32,8 +30,6 @@ public class ICliImpl implements ICli {
             System.out.print(">>");
             Scanner in = new Scanner(System.in);
             String inputString = in.next();
-//            e.readParam(inputString);
-            // выполняем команды
             Stream str = pipelineExecutor.execute(inputString);
             System.out.println("str result");
 
